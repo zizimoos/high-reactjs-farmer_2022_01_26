@@ -126,6 +126,64 @@ const ToggleBoxVariants = {
     transition: { duration: 0.5 },
   },
 };
+const SlideVariants = {
+  initial: (back: boolean) => {
+    return {
+      scale: 0,
+      opacity: 0,
+      x: back ? -500 : 500,
+      rotateY: 360,
+      transition: { type: "spring", duration: 1 },
+    };
+  },
+  // initial: {
+  //   scale: 0,
+  //   opacity: 0,
+  //   x: -500,
+  //   rotateY: 360,
+  //   transition: { type: "spring", duration: 1 },
+  // },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    x: 0,
+    transition: { duration: 1 },
+  },
+  leaving: (back: boolean) => {
+    return {
+      scale: 0,
+      opacity: 0,
+      x: back ? 500 : -500,
+      transition: { duration: 1 },
+    };
+  },
+  // leaving: {
+  //   scale: 0,
+  //   opacity: 0,
+  //   x: 500,
+  //   transition: { duration: 1 },
+  // },
+};
+
+const SlideWrapper = styled.div`
+  margin-top: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: row;
+`;
+const slideData = [
+  "first",
+  "second",
+  "third",
+  "fourth",
+  "fifth",
+  "sixth",
+  "seventh",
+  "eighth",
+  "ninth",
+  "tenth",
+];
 
 function App() {
   const biggerBoxRef = useRef<HTMLDivElement>(null);
@@ -164,6 +222,19 @@ function App() {
       console.log("scrollYProgress :" + scrollYProgress.get());
     });
   }, [scrollY, scrollYProgress]);
+  //////////////////////////////////////////////////////////
+  const [slideOn, setSlideOn] = useState(0);
+  const [back, setBack] = useState(false);
+
+  const onClickNext = () => {
+    setBack(false);
+    setSlideOn((prev) => (prev < slideData.length - 1 ? prev + 1 : 0));
+  };
+  const onClickPrev = () => {
+    setBack(true);
+    setSlideOn((prev) => (prev > 0 ? prev - 1 : slideData.length - 1));
+  };
+  console.log("slideOn :" + slideOn, "slideLength :" + slideData.length);
 
   return (
     <Wrapper style={{ background }}>
@@ -233,6 +304,40 @@ function App() {
           ></Box>
         ) : null}
       </AnimatePresence>
+      <SlideWrapper>
+        <AnimatePresence custom={back}>
+          {slideData.map((item, index) =>
+            slideOn === index ? (
+              <Box
+                custom={back}
+                variants={SlideVariants}
+                initial="initial"
+                animate="visible"
+                exit="leaving"
+                style={{
+                  width: "500px",
+                  position: "absolute",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: "white",
+                  fontSize: "2rem",
+                  color: "black",
+                }}
+                key={index}
+              >
+                {item}
+              </Box>
+            ) : null
+          )}
+        </AnimatePresence>
+      </SlideWrapper>
+      <div
+        style={{ marginTop: "150px", display: "flex", flexDirection: "row" }}
+      >
+        <button onClick={onClickPrev}>PREV</button>
+        <button onClick={onClickNext}>NEXT</button>
+      </div>
     </Wrapper>
   );
 }
