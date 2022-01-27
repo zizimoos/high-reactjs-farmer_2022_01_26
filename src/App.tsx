@@ -39,6 +39,41 @@ const Box2 = styled(motion.div)`
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 `;
 
+const Box3 = styled(motion.div)`
+  width: 400px;
+  height: 400px;
+  margin: 20px;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+`;
+const Box4 = styled(motion.div)`
+  width: 400px;
+  height: 400px;
+  margin: 20px;
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(255, 255, 255, 1);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+`;
+const Box5 = styled(motion.div)`
+  // width: 100px;
+  height: 100px;
+
+  border-radius: 30px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 1);
+`;
+
 const BiggerBox = styled(motion.div)`
   width: 400px;
   height: 400px;
@@ -59,6 +94,13 @@ const Circle = styled(motion.div)`
   background-color: white;
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
 `;
+const Circle2 = styled(motion.div)`
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background-color: #00a5ff;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+`;
 
 const Svg = styled.svg`
   width: 200px;
@@ -68,6 +110,15 @@ const Svg = styled.svg`
     stroke: white;
     stroke-width: 5;
   }
+`;
+
+const Overlay = styled(motion.div)`
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `;
 
 const svgVariants = {
@@ -165,6 +216,17 @@ const SlideVariants = {
   // },
 };
 
+const Grid = styled.div`
+  width: 50vw;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  div:first-child,
+  div:last-child {
+    grid-column: span 2;
+  }
+`;
+
 const SlideWrapper = styled.div`
   margin-top: 150px;
   display: flex;
@@ -235,6 +297,16 @@ function App() {
     setSlideOn((prev) => (prev > 0 ? prev - 1 : slideData.length - 1));
   };
   console.log("slideOn :" + slideOn, "slideLength :" + slideData.length);
+  ////////////////////////////////////////////////////////////
+
+  const [moveCenter, setMoveCenter] = useState(false);
+  const onClickMoveCenter = () => setMoveCenter((prev) => !prev);
+
+  ////////////////////////////////////////////////////////////
+  const [overClick, setOverClick] = useState(false);
+  const toggleOverClick = () => setOverClick((prev) => !prev);
+  const [id, setId] = useState<null | string>(null);
+  const [idContext, setIdContext] = useState<null | string>(null);
 
   return (
     <Wrapper style={{ background }}>
@@ -305,7 +377,7 @@ function App() {
         ) : null}
       </AnimatePresence>
       <SlideWrapper>
-        <AnimatePresence custom={back}>
+        <AnimatePresence exitBeforeEnter={false} custom={back}>
           {slideData.map((item, index) =>
             slideOn === index ? (
               <Box
@@ -338,6 +410,69 @@ function App() {
         <button onClick={onClickPrev}>PREV</button>
         <button onClick={onClickNext}>NEXT</button>
       </div>
+      <SlideWrapper onClick={onClickMoveCenter}>
+        <Box3
+          style={{
+            justifyContent: moveCenter ? "center" : "flex-start",
+            alignItems: moveCenter ? "center" : "flex-start",
+          }}
+        >
+          <Circle2 layout></Circle2>
+        </Box3>
+      </SlideWrapper>
+      <SlideWrapper
+        onClick={onClickMoveCenter}
+        style={{ marginBottom: "300px" }}
+      >
+        <Box4>
+          {moveCenter ? (
+            <Circle2
+              layoutId="sameThing"
+              style={{ borderRadius: "0px", scale: 2 }}
+            ></Circle2>
+          ) : null}
+        </Box4>
+        <Box4>
+          {!moveCenter ? (
+            <Circle2
+              layoutId="sameThing"
+              style={{ borderRadius: "50px" }}
+            ></Circle2>
+          ) : null}
+        </Box4>
+      </SlideWrapper>
+      <SlideWrapper style={{ marginBottom: "200px" }}>
+        <Grid>
+          {["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"].map((item) => (
+            <Box5
+              onClick={() => {
+                setIdContext(item);
+                setId(item);
+              }}
+              key={item}
+              layoutId={item}
+            >
+              {" "}
+              {item}
+            </Box5>
+          ))}
+        </Grid>
+
+        <AnimatePresence>
+          {id ? (
+            <Overlay
+              onClick={() => setId(null)}
+              initial={{ opacity: 0, backgroundColor: "rgb(0,0,0,0)" }}
+              animate={{ opacity: 1, backgroundColor: "rgb(0,0,0,0.5)" }}
+              exit={{ opacity: 0, backgroundColor: "rgb(0,0,0,0)" }}
+            >
+              <Box5 layoutId={id} style={{ width: "300px", height: "200px" }}>
+                {idContext}
+              </Box5>
+            </Overlay>
+          ) : null}
+        </AnimatePresence>
+      </SlideWrapper>
     </Wrapper>
   );
 }
